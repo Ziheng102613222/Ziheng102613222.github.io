@@ -111,7 +111,7 @@
     </div>
     
         <div id="toc" class="toc-article">
-    
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-text">（一）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-text">（二）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-text">（三）</span></a></li></ol>
 </div>
     
 </div>
@@ -161,25 +161,83 @@
 </span>
     </div>
     <div class="post-content no-indent">
-        <p>昨晚的WWDC——大概可以粗略理解为苹果每年发布下一代系统的发布会——原片我还没来得及看。看网上评论 说是这次发布还挺重要的，可以说是把AI手机这个概念从 <strong>“做一个有AI功能的App”</strong> 转换成了 <strong>“让AI功能无形之中集成在整个系统内”</strong>。等我有时间，下次详细分析一下新Apple Intelligence的架构吧。</p>
+        <p>昨晚的WWDC——大概可以粗略理解为苹果每年发布下一代系统的发布会——原片我还没来得及看。</p>
+<p>看网上评论 说是这次发布还挺重要的，可以说是把AI手机这个概念从 <strong>“做一个有AI功能的App”</strong> 转换成了 <strong>“让AI功能无形之中集成在整个系统内”</strong>。等我有时间，下次详细分析一下新Apple Intelligence的架构吧。</p>
 <p>​	</p>
-<p>先不说那些看似美好的远景；或者不如说 远景越美好，苹果眼下的操作就越重量级：</p>
+<p>先不说那些看似美好的远景；或者不如说 远景越美好，苹果眼下的操作就越重量级——</p>
+<p>下一代Apple Intelligence的高级模型强制要求设备拥有<strong>12GB或以上的内存？！</strong></p>
+<p>我真的不想一次又一次吐槽苹果的重量级内存策略了，但是直到2026了，他们居然还在这方面一次又一次地整出这种烂活儿。。。</p>
+<p>​			 </p>
+<h1 align="center">（一）</h1>
+
+<p>先把故事回到几年前。</p>
+<p>苹果把内存限制当成促进顾客换代的一大法宝，这不是一年两年的事情了。</p>
+<p>很多年前，记得我还在中学的时候，就有iPhone 6才1g内存打同期安卓3g内存的笑话<span style="color: #999; font-size: 0.8em;">（这还是我第一台用过的iPhone，草）</span>。内存严重不足的结果是，iPhone 6最高只能上到iOS 12，而它下一代的6s（内存2g）能到iOS 15，多1g内存带来了足足多三年的支持。</p>
+<p>2020-22年这个时期，iPhone的内存是中端机4g、旗舰Pro 6g。同期的安卓旗舰则是起步8g&#x2F;顶级12g，这是整整2倍的差距。</p>
+<p>到23年，连挤了3年4&#x2F;6g内存搭配的牙膏后，苹果终于在第四年姗姗来迟，把内存搭配升格到了iPhone 15 6g &#x2F; 15pro 8g内存。但同期的国产安卓旗舰也基本把规格升级为12&#x2F;16gb高低搭配，所以仍然是2倍差距。</p>
+<p>苹果的算盘其实很精明：内存减配当然能降低成本，但更重要的点其实在于防止钉子户不换代。这就是所谓的<strong>“计划性报废”</strong>：有好几代全方面优秀的iPhone，就是因为存在内存这一个短板 而直接卡死了使用寿命，很难继续延长。</p>
+<p>另一方面，从系统底层架构来看 iOS的内存消耗确实就是比安卓小一些，因此对用户体验的牺牲 实际上并没有账面数字看起来那么大。</p>
+<p>​		 </p>
+<h1 align="center">（二）</h1>
+
+<p>——但，大模型来了。</p>
+<p>苹果以往抠抠搜搜的内存策略，在大模型对内存的需求面前 人都傻了：</p>
+<p><strong>手机上的端侧大模型必须要占用内存</strong>。这是因为大模型的输出速度属于典型的带宽瓶颈型bandwidth bound；也就是说，吐字速度快慢并不是看算力的高低，而主要取决于芯片读取模型参数的速度。内存的速度普遍是硬盘&#x2F;闪存的几十倍，所以端侧大模型不用内存跑就根本没法用。</p>
+<p>另一方面，<strong>端侧大模型还很占内存空间</strong>。想要模型更聪明能干，就需要更多的参数 占用更多的内存。虽然也有压缩的方法，但压缩也有极限 压缩太严重模型就根本没有智力了。具体要消耗多少内存 甚至是可以直接算出来的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">以iPhone 15为例，6GB内存</span><br><span class="line">系统运行基础消耗和日常App：~3.5GB</span><br><span class="line">3B端侧大模型 4bit量化：1.5GB</span><br><span class="line">KV Cache：1~2GB</span><br><span class="line">-----合计：6~7GB</span><br></pre></td></tr></table></figure>
+
+
+
+<p>大模型可不管你的系统有什么内存优化，内存不够大 跑不了就是跑不了。3B模型已经属于参数量比较小的模型，但哪怕模型已经很小了 6g内存的iPhone 15也完全不可能放下，连8g内存的15Pro也是相当勉强。</p>
+<p>于是，我们就在WWDC2024上看到了如下离谱的操作：</p>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Ziheng102613222/Blog_Images/main/WWDC24_Requirements.png" width="80%">
+</div>
+**请注意：这个发布会出场时 最新的iPhone就是iPhone 15。**
+
+<p><strong>当时14系列才发布一年半而已，14还官网在售 却无缘AI；最离谱的是最新款(!)的15，就因为苹果抠抠搜搜不愿意一步到位 15和15Pro都给8g内存，导致居然有发布才9个月，依然是最新款 却被排挤出最新功能的事情！</strong></p>
+<p>​		</p>
+<p>——苹果的行为毫无疑问是背刺老用户，但站在当时来看 似乎也可以说“他不是故意不让老用户用，只是形势变化太快了顾不上老用户”来解释。</p>
+<p>另一方面，Apple Intelligence发布两年，国内根本不准用，但国外能用的人也普遍反馈纯鸡肋。就算是内存多得多的安卓厂商，这两年来端侧模型也没整出什么杀手级应用，目前云端大模型还是主流。</p>
+<p>所以说：幸好Apple Intelligence本来也没什么用，用户虽说是被背刺了 但也没有什么实质性的损失。</p>
+<p>​			  </p>
+<h1 align="center">（三）</h1>
+
+<p>——直到今天。</p>
+<p>我还没来得及看发布会本体，就在讨论WWDC26的帖子里看见了这张图：</p>
 <div align="center">
   <img src="https://raw.githubusercontent.com/Ziheng102613222/Blog_Images/main/WWDC26_Requirements.png" width="80%">
   <br>
   <span style="color: #888; font-size: 0.9em; position: relative; top: -5px;">▲ iPhone Air和17Pro是目前唯二的有12g内存的iPhone</span>
 </div>
 
-<p>下一代Apple Intelligence的高级模型强制要求设备拥有<strong>12GB或以上的内存？！</strong></p>
-<p>我真的不想一次又一次吐槽苹果的重量级内存策略了，但是直到2026了，他们居然还在这方面一次又一次地整出这种烂活儿。。。</p>
+<p>不是，又把中端机的17<span style="color: #999; font-size: 0.8em;">（8g内存）</span>——因为18延期 所以还会当成最新款在售一整年的17——给淘汰了，苹果你是人吗😅😅😅😅😅</p>
+<p>我才买17不久啊😅😅😅😅😅</p>
+<p>​			 </p>
+<p>苹果你这么搞，我就一定要把Apple Intelligence诞生这两年来离谱的事情一件一件说了：</p>
+<p>——24年开个发布会吹ai，当时吹的时候还是用15pro当演示机。现在马上18pro都要来了，整整两年了 国行落地连个影子都没有；</p>
+<p>——好在能用ai的海外Apple Intelligence也是鸡肋，国内用户也没有亏什么（笑死</p>
+<p>——24年那场发布会 在后来被曝出了丑闻：<strong>发布会上具有系统性集成的强大Siri 其中的演示实际上是虚构的。Siri团队根本没有做出能运行的东西，营销团队却声称他们具有这项功能 并且居然还给出了发布的时间表！</strong></p>
+<p>结果是，功能实际实现的时间从最初说的“今年”拖到“iOS 18的后期版本”再拖到“iOS 26”。直到第三年的iOS 27，苹果才终于把两年前他们最初吹的东西给做出来。这段故事可参见：<a target="_blank" rel="noopener" href="https://www.macrumors.com/2025/04/10/chaos-behind-siri-revealed/">报导</a></p>
 <p>​		</p>
-<p>先把故事回到几年前。</p>
-<p>苹果长期把内存限制当成促进顾客换代 防止钉子户的一大法宝。</p>
-<p>很多年前，我记得我还在中学的时候，就有iPhone 6才1g内存打同期安卓3g内存的笑话<span style="color: #999; font-size: 0.8em;">（这还是我第一台用过的iPhone，草）</span>。内存严重不足的结果是，iPhone 6最高只能上到iOS 12，而它下一代的6s（内存2g）能到iOS 15，多1g内存带来了足足多三年的支持。</p>
-<p>2020-22年，故事也是同理。这个时期 苹果在中端机使用4g内存，高端机（Pro）给6g。同期的安卓旗舰则是旗舰起步8g，顶级旗舰12g；换言之，是整整2倍的差距。</p>
-<p>2023年，连挤了3年4&#x2F;6g内存搭配的牙膏后，苹果终于在第四年姗姗来迟，把内存搭配升格到了iPhone 15 6g &#x2F; 15pro 8g内存。但与此同时的国产安卓旗舰也基本把内存升级为12&#x2F;16gb高低搭配，所以仍然是2倍差距。</p>
-<p>苹果也是重量级<br>24年开个发布会吹ai，整整两年了落地连个影子都没有<br>更搞笑的是过了两年说完整版的大模型刚需iPhone 17 Pro（高阶20b参数，普通的就3b参数），连现在在卖的17都不行</p>
-<p>难以想象要是有人2024听了苹果宣传的ai去买手机，买最贵的iPhone照样不支持高端模型，搞笑呢</p>
+<p>——更搞笑的是两年前吹的功能，过了两年终于实现了 说完整版的大模型刚需iPhone 17 Pro，连现在在卖的17都不行？？？？！</p>
+<p>并且，高阶的端侧模型和旧设备支持的小模型差距相当大。发布会里 苹果只是说“高阶端侧模型支持更准确的听写和更富有表现力的Siri声音”，看起来挺无关紧要。但实际上，高阶模型有足足<strong>20B</strong>的参数（虽然是稀疏模型） 并且是多模态，而旧模型只有区区3B（下图）。况且，谁又能保证苹果不会进一步拉大二者之间能力的差别呢？</p>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Ziheng102613222/Blog_Images/main/AFM3_Core.JPG" width="90%">
+</div>
+
+
+<p>——我还很想吐槽一点。就是支持高阶模型的iPad型号是“iPad with M4 and Later”，但下面还有一行小字：要求至少12g内存。那么是什么iPad明明有M4却还没有12g内存呢？好难猜啊！</p>
+<p>这个事情最抽象的点在于：<strong>iPad Pro M4低配在物理上实际是有12g内存的（有 <a target="_blank" rel="noopener" href="https://www.tomshardware.com/tablets/ipads/m4-ipad-pros-with-8gb-of-ram-may-actually-have-12gb-teardowns-reveal-possible-apple-hijinks">拆机</a> 证实），但被苹果软件阉割到只允许用8g</strong>。其中原因据说是4gb的单个颗粒实在太小 内存厂商已经不怎么产了，苹果干脆买2*6gb再砍成8gb用。</p>
+<p>当时这件事倒也不重要 反正功能也没区别；<strong>现在看 尼玛，我24年花一万块买的iPad，硬件性能完全过剩，就因为一个实际上有但不准我用的幽灵内存，导致我没法用高阶模型？？？？？</strong></p>
+<p>​		</p>
+<p>不过，好在有个好消息：大冤种不止我一个。</p>
+<p>我记得2024发布iPhone 16的时候，国内宣传还算收敛点，几乎所有海外宣传文案都在高呼built for apple intelligence。</p>
+<p>难以想象，要是有人2024听了苹果宣传的ai去买手机 现在该怎么想呢？</p>
+<p>当年就算买最贵的iPhone，到2026年的今天不仅照样不支持高端模型，甚至国行连个旧版智障Apple Intelligence的影子都见不到，纯搞笑呢。。。</p>
+<p>​		</p>
+<p>于2026年6月9日晚</p>
+<p>6月25日，有修改。</p>
 
         
         <br />
